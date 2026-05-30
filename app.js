@@ -241,26 +241,22 @@ async function send() {
     imagePreviewContainer.style.display = 'none';
     chat.scrollTop = chat.scrollHeight;
     
-    // Update apiMessages
-    const lastMsg = apiMessages[apiMessages.length - 1];
-    if (lastMsg && lastMsg.role === 'user' && typeof lastMsg.content === 'string' && !imageToSend) {
-        lastMsg.content += `\n\n${userPrompt}`;
-    } else {
-        let content = userPrompt;
-        if (imageToSend) {
-            const instruction = "You are an OCR text extraction engine. Perfectly extract all text from the image. Do NOT answer the user's prompt, do not solve problems, and do not explain anything. Just output the extracted text. If there is no text, just describe the image briefly.";
-            const promptWithInstruction = userPrompt ? `${instruction}\n\nUser Question (DO NOT ANSWER THIS, JUST EXTRACT TEXT): ${userPrompt}` : instruction;
-            content = [
-                { type: "text", text: promptWithInstruction },
-                { type: "image_url", image_url: { url: imageToSend } }
-            ];
-        }
-        apiMessages.push({ role: 'user', content: content });
+    // Build user content
+    let content = userPrompt;
+    if (imageToSend) {
+        const instruction = "You are an OCR text extraction engine. Perfectly extract all text from the image. Do NOT answer the user's prompt, do not solve problems, and do not explain anything. Just output the extracted text. If there is no text, just describe the image briefly.";
+        const promptWithInstruction = userPrompt ? `${instruction}\n\nUser Question (DO NOT ANSWER THIS, JUST EXTRACT TEXT): ${userPrompt}` : instruction;
+        content = [
+            { type: "text", text: promptWithInstruction },
+            { type: "image_url", image_url: { url: imageToSend } }
+        ];
     }
+    apiMessages.push({ role: 'user', content: content });
 
     saveCurrentSession({ role: 'user', content: userPrompt + (imageToSend ? ' [Image Attached]' : '') });
 
-    if (apiMessages.length > 2) apiMessages = apiMessages.slice(-2);
+    // Keep the last 10 messages (5 turns) in context
+    if (apiMessages.length > 10) apiMessages = apiMessages.slice(-10);
 
     // Prepare AI UI
     currentAiMessage = createMessageElement('ai');
@@ -288,7 +284,10 @@ async function send() {
             chat.scrollTop = chat.scrollHeight;
         });
 
-        if (fullResponse) saveCurrentSession({ role: 'assistant', content: fullResponse });
+        if (fullResponse) {
+            saveCurrentSession({ role: 'assistant', content: fullResponse });
+            apiMessages.push({ role: 'assistant', content: fullResponse });
+        }
 
         // Auto-Router OCR Pipeline
         if (imageToSend) {
@@ -319,7 +318,13 @@ async function send() {
                 chat.scrollTop = chat.scrollHeight;
             });
 
-            if (solverResponse) saveCurrentSession({ role: 'assistant', content: solverResponse });
+            if (solverResponse) {
+                saveCurrentSession({ role: 'assistant', content: solverResponse });
+                // We overwrite the OCR vision interaction in history with the final solver response
+                apiMessages.pop(); // Remove the AI vision response (which was added above if not blocked)
+                apiMessages.pop(); // Remove the user forwarding message
+                apiMessages.push({ role: 'assistant', content: solverResponse });
+            }
         }
     } catch (err) {
         alert('API Error: ' + err.message);
