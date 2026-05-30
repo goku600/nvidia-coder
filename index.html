@@ -13,7 +13,6 @@
     <div id="toolbar">
         <button class="toolbar-btn active" id="newChatBtn">+ New Chat</button>
         <button class="toolbar-btn" id="historyBtn">History</button>
-        <button class="toolbar-btn" id="settingsBtn" style="flex: 0 0 auto;">⚙️</button>
     </div>
 
     <div id="chat-view">
@@ -43,19 +42,6 @@
         <div style="display: flex; gap: 8px;">
             <textarea id="prompt" placeholder="Press Enter to send (Shift+Enter for newline)"></textarea>
             <button id="sendBtn" class="toolbar-btn" style="background: var(--vscode-button-background); color: var(--vscode-button-foreground); padding: 0 16px;">Send</button>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: var(--vscode-editorWidget-background); border: 1px solid var(--vscode-widget-border); border-radius: 8px; padding: 20px; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px;">
-            <h3 style="margin: 0;">Settings</h3>
-            <p style="margin: 0; font-size: 13px; opacity: 0.8;">Enter your NVIDIA NIM API Key. It is stored securely in your browser's local storage and sent directly to NVIDIA.</p>
-            <input type="password" id="apiKeyInput" placeholder="nvapi-..." style="width: 100%; padding: 10px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); border-radius: 4px; font-family: monospace;">
-            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
-                <button id="closeSettingsBtn" class="toolbar-btn" style="flex: 0 0 auto;">Cancel</button>
-                <button id="saveSettingsBtn" class="toolbar-btn" style="flex: 0 0 auto; background: var(--vscode-button-background); color: var(--vscode-button-foreground);">Save</button>
-            </div>
         </div>
     </div>
 

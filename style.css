@@ -41,11 +41,13 @@ body {
 
 #chat-view, #history-view { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 #history-view { display: none; padding: 8px; }
-#chat { flex: 1; overflow-y: auto; padding: 12px; }
+#chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
 
-.message { margin-bottom: 14px; padding: 12px; border-radius: 8px; line-height: 1.5; word-wrap: break-word; font-size: 15px; }
-.user { background: var(--vscode-button-background); color: var(--vscode-button-foreground); margin-left: 20%; border-bottom-right-radius: 2px; }
-.ai { background: var(--vscode-editorWidget-background); border: 1px solid var(--vscode-widget-border); margin-right: 10%; border-bottom-left-radius: 2px; }
+.message { padding: 12px 16px; line-height: 1.6; word-wrap: break-word; font-size: 15px; border-radius: 18px; max-width: 85%; }
+.user { background: #2f2f2f; color: #ececec; align-self: flex-end; border-bottom-right-radius: 4px; width: fit-content; }
+.ai { background: transparent; color: #ececec; align-self: flex-start; max-width: 100%; width: 100%; padding: 0; }
+.ai pre { background: #1a1a1a; padding: 12px; overflow-x: auto; border-radius: 8px; border: 1px solid #333; margin: 8px 0; }
+.ai code { font-family: Consolas, "Courier New", monospace; font-size: 14px; color: #e3e3e3; }
 
 .tool { font-family: monospace; font-size: 0.85em; opacity: 0.7; background: var(--vscode-textCodeBlock-background); padding: 4px 8px; border-radius: 4px; display: block; margin: 4px 0; }
 

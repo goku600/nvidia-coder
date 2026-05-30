@@ -3,11 +3,6 @@ const promptInput = document.getElementById('prompt');
 const sendBtn = document.getElementById('sendBtn');
 const newChatBtn = document.getElementById('newChatBtn');
 const historyBtn = document.getElementById('historyBtn');
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsModal = document.getElementById('settings-modal');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 
 const chatView = document.getElementById('chat-view');
 const historyView = document.getElementById('history-view');
@@ -31,28 +26,6 @@ let apiMessages = [];
 modelSelect.value = localStorage.getItem('nvidiaModel') || 'auto';
 modelSelect.addEventListener('change', () => {
     localStorage.setItem('nvidiaModel', modelSelect.value);
-});
-
-// Settings UI Logic
-apiKeyInput.value = localStorage.getItem('nvidiaApiKey') || '';
-
-settingsBtn.addEventListener('click', () => {
-    apiKeyInput.value = localStorage.getItem('nvidiaApiKey') || '';
-    settingsModal.style.display = 'flex';
-});
-
-closeSettingsBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'none';
-});
-
-saveSettingsBtn.addEventListener('click', () => {
-    const key = apiKeyInput.value.trim();
-    if (key) {
-        localStorage.setItem('nvidiaApiKey', key);
-    } else {
-        localStorage.removeItem('nvidiaApiKey');
-    }
-    settingsModal.style.display = 'none';
 });
 
 function generateSessionId() {
@@ -150,17 +123,9 @@ function createMessageElement(role) {
 const SYSTEM_PROMPT = `You are a concise AI assistant. You solve problems quickly and efficiently.`;
 
 async function askNvidiaProxy(messagesToSent, targetModel, onChunk) {
-    const apiKey = localStorage.getItem('nvidiaApiKey');
-    if (!apiKey) {
-        throw new Error('Please set your NVIDIA API Key in Settings (⚙️) first.');
-    }
-
-    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+    const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             model: targetModel,
             messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messagesToSent],
