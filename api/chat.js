@@ -1,5 +1,5 @@
 export const config = {
-    runtime: 'edge', // Edge functions are faster and perfect for streaming proxy
+    maxDuration: 60 // Allow up to 60 seconds for massive models like Qwen 480B to respond
 };
 
 export default async function handler(req) {
