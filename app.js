@@ -181,14 +181,18 @@ async function askNvidiaProxy(messagesToSent, targetModel, onChunk) {
     const reader = response.body.getReader();
     const decoder = new TextDecoder("utf-8");
     let done = false;
+    let buffer = "";
 
     while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
         if (value) {
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n').filter(line => line.trim() !== '');
-            for (const line of lines) {
+            buffer += decoder.decode(value, { stream: true });
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.slice(0, newlineIndex).trim();
+                buffer = buffer.slice(newlineIndex + 1);
+
                 if (line === 'data: [DONE]') continue;
                 if (line.startsWith('data: ')) {
                     try {
@@ -196,7 +200,9 @@ async function askNvidiaProxy(messagesToSent, targetModel, onChunk) {
                         if (parsed.choices && parsed.choices[0].delta.content) {
                             onChunk(parsed.choices[0].delta.content);
                         }
-                    } catch (e) { }
+                    } catch (e) {
+                        // Incomplete JSON or other error, handled silently but not dropped due to buffer loop
+                    }
                 }
             }
         }
