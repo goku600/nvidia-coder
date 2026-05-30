@@ -174,8 +174,13 @@ async function askNvidiaProxy(messagesToSent, targetModel, onChunk) {
     });
 
     if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Unknown error');
+        const errorText = await response.text();
+        try {
+            const errorObj = JSON.parse(errorText);
+            throw new Error(errorObj.error || 'Unknown error');
+        } catch(e) {
+            throw new Error(errorText || 'Network error');
+        }
     }
 
     const reader = response.body.getReader();
