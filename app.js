@@ -277,7 +277,19 @@ async function send() {
 
     try {
         let fullResponse = '';
-        await askNvidiaProxy(apiMessages, targetModel, (chunk) => {
+        
+        // If we are NOT using the vision model, we must flatten any historical image arrays into plain text
+        // Otherwise, text models (like Llama 3.1 8B) will crash with a Prompt Template Error
+        const safeMessages = apiMessages.map((msg, index) => {
+            // Keep the array format ONLY for the very last message if we are actively sending an image
+            if (Array.isArray(msg.content) && (!imageToSend || index !== apiMessages.length - 1)) {
+                const textParts = msg.content.filter(c => c.type === 'text').map(c => c.text);
+                return { role: msg.role, content: textParts.join('\n[Image was sent here]\n') };
+            }
+            return msg;
+        });
+
+        await askNvidiaProxy(safeMessages, targetModel, (chunk) => {
             fullResponse += chunk;
             currentRawText += chunk;
             currentAiMessage.innerHTML = marked.parse(currentRawText);
@@ -302,13 +314,17 @@ async function send() {
             
             apiMessages.push({ role: 'user', content: `Here is the transcribed text from the image:\n\n${problemText}\n\nPlease answer my original question: ${userPrompt}` });
             
-            const solverMessages = apiMessages.map(msg => {
+            const solverMessages = safeMessages.map(msg => {
                 if (Array.isArray(msg.content)) {
                     const textParts = msg.content.filter(c => c.type === 'text').map(c => c.text);
                     return { role: msg.role, content: textParts.join('\n') };
                 }
                 return msg;
             });
+
+            // Replace the last user message with the transcribed forward
+            solverMessages.pop();
+            solverMessages.push({ role: 'user', content: `Here is the transcribed text from the image:\n\n${problemText}\n\nPlease answer my original question: ${userPrompt}` });
 
             let solverResponse = '';
             await askNvidiaProxy(solverMessages, 'qwen/qwen3-coder-480b-a35b-instruct', (chunk) => {
