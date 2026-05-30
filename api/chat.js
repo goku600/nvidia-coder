@@ -7,6 +7,12 @@ export default async function handler(req) {
         return new Response('Method not allowed', { status: 405 });
     }
 
+    const appPassword = process.env.APP_PASSWORD;
+    const providedPassword = req.headers.get('x-app-password');
+    if (appPassword && providedPassword !== appPassword) {
+        return new Response(JSON.stringify({ error: 'Unauthorized: Incorrect Passcode' }), { status: 401 });
+    }
+
     const apiKey = process.env.NVIDIA_API_KEY;
     if (!apiKey) {
         return new Response(JSON.stringify({ error: 'NVIDIA_API_KEY environment variable is missing in Vercel' }), { status: 500 });

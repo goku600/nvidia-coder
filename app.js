@@ -3,6 +3,11 @@ const promptInput = document.getElementById('prompt');
 const sendBtn = document.getElementById('sendBtn');
 const newChatBtn = document.getElementById('newChatBtn');
 const historyBtn = document.getElementById('historyBtn');
+const lockBtn = document.getElementById('lockBtn');
+const passcodeModal = document.getElementById('passcode-modal');
+const passcodeInput = document.getElementById('passcodeInput');
+const savePasscodeBtn = document.getElementById('savePasscodeBtn');
+const closePasscodeBtn = document.getElementById('closePasscodeBtn');
 
 const chatView = document.getElementById('chat-view');
 const historyView = document.getElementById('history-view');
@@ -26,6 +31,31 @@ let apiMessages = [];
 modelSelect.value = localStorage.getItem('nvidiaModel') || 'auto';
 modelSelect.addEventListener('change', () => {
     localStorage.setItem('nvidiaModel', modelSelect.value);
+});
+
+// Passcode UI Logic
+passcodeInput.value = localStorage.getItem('appPasscode') || '';
+if (!passcodeInput.value) {
+    passcodeModal.style.display = 'flex';
+}
+
+lockBtn.addEventListener('click', () => {
+    passcodeInput.value = localStorage.getItem('appPasscode') || '';
+    passcodeModal.style.display = 'flex';
+});
+
+closePasscodeBtn.addEventListener('click', () => {
+    passcodeModal.style.display = 'none';
+});
+
+savePasscodeBtn.addEventListener('click', () => {
+    const code = passcodeInput.value.trim();
+    if (code) {
+        localStorage.setItem('appPasscode', code);
+    } else {
+        localStorage.removeItem('appPasscode');
+    }
+    passcodeModal.style.display = 'none';
 });
 
 function generateSessionId() {
@@ -123,9 +153,14 @@ function createMessageElement(role) {
 const SYSTEM_PROMPT = `You are a concise AI assistant. You solve problems quickly and efficiently.`;
 
 async function askNvidiaProxy(messagesToSent, targetModel, onChunk) {
+    const passcode = localStorage.getItem('appPasscode') || '';
+
     const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'x-app-password': passcode
+        },
         body: JSON.stringify({
             model: targetModel,
             messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messagesToSent],

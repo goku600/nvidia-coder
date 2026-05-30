@@ -13,6 +13,7 @@
     <div id="toolbar">
         <button class="toolbar-btn active" id="newChatBtn">+ New Chat</button>
         <button class="toolbar-btn" id="historyBtn">History</button>
+        <button class="toolbar-btn" id="lockBtn" style="flex: 0 0 auto;" title="App Passcode">🔒</button>
     </div>
 
     <div id="chat-view">
@@ -42,6 +43,19 @@
         <div style="display: flex; gap: 8px;">
             <textarea id="prompt" placeholder="Press Enter to send (Shift+Enter for newline)"></textarea>
             <button id="sendBtn" class="toolbar-btn" style="background: var(--vscode-button-background); color: var(--vscode-button-foreground); padding: 0 16px;">Send</button>
+        </div>
+    </div>
+
+    <!-- Passcode Modal -->
+    <div id="passcode-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--vscode-editorWidget-background); border: 1px solid var(--vscode-widget-border); border-radius: 12px; padding: 20px; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h3 style="margin: 0; text-align: center;">App Passcode</h3>
+            <p style="margin: 0; font-size: 13px; opacity: 0.8; text-align: center;">Enter your private passcode to use the AI.</p>
+            <input type="password" id="passcodeInput" placeholder="••••••••" style="width: 100%; padding: 12px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); border-radius: 6px; font-family: monospace; text-align: center; font-size: 18px;">
+            <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 8px;">
+                <button id="closePasscodeBtn" class="toolbar-btn" style="flex: 1;">Cancel</button>
+                <button id="savePasscodeBtn" class="toolbar-btn" style="flex: 1; background: var(--vscode-button-background); color: var(--vscode-button-foreground);">Save</button>
+            </div>
         </div>
     </div>
 
