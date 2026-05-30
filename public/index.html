@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e1e1e">
+    <title>NVIDIA Coder PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div id="toolbar">
+        <button class="toolbar-btn active" id="newChatBtn">+ New Chat</button>
+        <button class="toolbar-btn" id="historyBtn">History</button>
+    </div>
+
+    <div id="chat-view">
+        <div id="chat"></div>
+    </div>
+
+    <div id="history-view">
+        <div id="history-list"></div>
+    </div>
+
+    <div id="input-area">
+        <div id="controls-row">
+            <select id="modelSelect" class="model-select" title="Choose AI Model">
+                <option value="auto">Auto (Smart Route)</option>
+                <option value="meta/llama-3.1-8b-instruct">Llama 3.1 8B (Instant)</option>
+                <option value="meta/llama-3.3-70b-instruct">Llama 3.3 70B (Smart)</option>
+                <option value="qwen/qwen3-coder-480b-a35b-instruct">Qwen 480B (Coder/Math)</option>
+                <option value="meta/llama-3.2-11b-vision-instruct">Llama 3.2 11B Vision</option>
+            </select>
+            <button id="attachBtn" class="toolbar-btn" style="flex: 0; padding: 4px 8px; margin-left: 4px; font-size: 14px; background: transparent;" title="Attach Image">📎</button>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        </div>
+        <div id="image-preview-container">
+            <img id="image-preview" src="">
+            <button id="remove-image" title="Remove image">×</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <textarea id="prompt" placeholder="Press Enter to send (Shift+Enter for newline)"></textarea>
+            <button id="sendBtn" class="toolbar-btn" style="background: var(--vscode-button-background); color: var(--vscode-button-foreground); padding: 0 16px;">Send</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('ServiceWorker registered:', reg.scope);
+                }).catch(err => {
+                    console.error('ServiceWorker registration failed:', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
